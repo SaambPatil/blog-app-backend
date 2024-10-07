@@ -1,12 +1,11 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 app.use(express.json());
 
 const blogs = [
   {
-    id: uuidv4(),
+    id: 1,
     title: "Introduction to Graphs",
     description: "ucdsuvsdv vsbv",
     data: "cjdbjbc",
@@ -25,7 +24,7 @@ app.post("/blogs", (req, res) => {
   const { title, description, data, category, tags, author } = req.body;
 
   const newBlog = {
-    id: uuidv4(),
+    id: blogs.length + 1,
     title,
     description,
     data,
@@ -40,12 +39,12 @@ app.post("/blogs", (req, res) => {
 });
 
 app.put("/blogs/:id", (req, res) => {
-  const { id } = req.params;
+  const id = parseInt(req.params.id); 
   const { title, description, data, category, tags, author } = req.body;
 
-  const index = blogs.findIndex((x) => x.id === id);
+  const index = blogs.findIndex((x) => x.id == id); 
 
-  if (index == -1) {
+  if (index === -1) {
     res.status(404).json({ error: "Blog not found" });
   } else {
     const updatedBlog = {
