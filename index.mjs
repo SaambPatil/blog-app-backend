@@ -25,7 +25,6 @@ app.get("/blogs", (req, res) => {
 app.post("/blogs", (req, res) => {
   console.log("Received POST request");
 
-
   const { title, description, data, category, tags, author } = req.body;
 
   const newBlog = {
@@ -45,7 +44,6 @@ app.post("/blogs", (req, res) => {
 
 app.put("/blogs/:id", (req, res) => {
   console.log("Received PUT request");
-
 
   const id = req.params.id;
 
@@ -97,6 +95,24 @@ app.patch("/blogs/:id", (req, res) => {
   blogs[index] = updatedBlog;
   res.status(200).json(updatedBlog);
 });
+
+app.delete("/blogs/:id", (req, res) => {
+  console.log("Received DELETE request");
+  const id = req.params.id;
+
+  const index = blogs.findIndex((x) => x.id == id);
+
+  if (index == -1) {
+    return res.status(404).json({ error: "Blog Not Found" });
+  }
+
+  const deletedBlog = blogs[index];
+
+  blogs.splice(index, 1);
+
+  res.status(204).json({ message: "Deleted data is:", deletedBlog });
+});
+
 
 const port = 3000;
 app.listen(port, () => {
