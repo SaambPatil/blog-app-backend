@@ -61,7 +61,7 @@ app.get("/blogs", (req, res) => {
   // }
 
   if (category) {
-    const filteredBlogs = blogs.filter((blog) => blog.category === category);
+    const filteredBlogs = blogs.filter((blog) => blog.category == category);
     return res.status(200).json(filteredBlogs);
   }
 
