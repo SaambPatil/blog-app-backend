@@ -22,6 +22,39 @@ app.get("/blogs", (req, res) => {
   res.status(200).json(blogs);
 });
 
+app.get("/blogs", (req, res) => {
+  console.log("Received GET FILTER");
+
+  const { category } = req.query;
+   console.log("Category received:", category);
+  // if (category) {
+  //   const filteredBlogs = [];
+  //   for (let i = 0; i < blogs.length; i++) {
+  //     if (blogs[i].category === category) {
+  //       filteredBlogs.push(blogs[i]);
+  //     }
+  //   }
+  // }
+
+  // if (category) {
+  //   const filteredBlogs = [];
+
+  //   blogs.forEach((blog) => {
+  //     if (blog.category == category) {
+  //       filteredBlogs.push(blog);
+  //     }
+  //   });
+  // }
+
+  if (category) {
+    const filteredBlogs = blogs.filter((blog) => blog.category === category);
+    return res.status(200).json(filteredBlogs);
+  }
+
+  console.log("Found");
+  res.status(200).json({ error: "Invalid category" });
+});
+
 app.post("/blogs", (req, res) => {
   console.log("Received POST request");
 
@@ -103,6 +136,7 @@ app.delete("/blogs/:id", (req, res) => {
   const index = blogs.findIndex((x) => x.id == id);
 
   if (index == -1) {
+    console.log("INFINITE");
     return res.status(404).json({ error: "Blog Not Found" });
   }
 
@@ -110,9 +144,8 @@ app.delete("/blogs/:id", (req, res) => {
 
   blogs.splice(index, 1);
 
-  res.status(204).json({ message: "Deleted data is:", deletedBlog });
+  res.status(200).json({ message: "Deleted data is:", deletedBlog });
 });
-
 
 const port = 3000;
 app.listen(port, () => {
