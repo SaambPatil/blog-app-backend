@@ -22,6 +22,20 @@ app.get("/blogs", (req, res) => {
   res.status(200).json(blogs);
 });
 
+app.get("/blogs/:id", (req, res) => {
+  console.log("Received GET request by ID");
+
+  const { id } = req.params; 
+  const blog = blogs.find((b) => b.id == id);
+
+  if (blog) {
+    return res.status(200).json(blog); 
+  }
+
+  res.status(404).json({ error: "Blog not found" });
+});
+
+
 app.get("/blogs", (req, res) => {
   console.log("Received GET FILTER");
 
@@ -30,7 +44,7 @@ app.get("/blogs", (req, res) => {
   // if (category) {
   //   const filteredBlogs = [];
   //   for (let i = 0; i < blogs.length; i++) {
-  //     if (blogs[i].category === category) {
+  //     if (blogs[i].category == category) {
   //       filteredBlogs.push(blogs[i]);
   //     }
   //   }
