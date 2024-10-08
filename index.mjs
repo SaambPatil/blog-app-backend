@@ -1,5 +1,5 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid"; 
+import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 app.use(express.json());
@@ -18,14 +18,18 @@ const blogs = [
 ];
 
 app.get("/blogs", (req, res) => {
+  console.log("Received GET request");
   res.status(200).json(blogs);
 });
 
 app.post("/blogs", (req, res) => {
+  console.log("Received POST request");
+
+
   const { title, description, data, category, tags, author } = req.body;
 
   const newBlog = {
-    id: uuidv4(), 
+    id: uuidv4(),
     title,
     description,
     data,
@@ -40,6 +44,9 @@ app.post("/blogs", (req, res) => {
 });
 
 app.put("/blogs/:id", (req, res) => {
+  console.log("Received PUT request");
+
+
   const id = req.params.id;
 
   const index = blogs.findIndex((x) => x.id === id);
@@ -62,6 +69,29 @@ app.put("/blogs/:id", (req, res) => {
     category,
     tags,
     author,
+    createdOn: blogs[index].createdOn,
+  };
+  blogs[index] = updatedBlog;
+  res.status(200).json(updatedBlog);
+});
+app.patch("/blogs/:id", (req, res) => {
+  console.log("Received PATCH request");
+  const id = req.params.id;
+
+  const index = blogs.findIndex((x) => x.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Blog not found" });
+  }
+
+  const updatedBlog = {
+    id: blogs[index].id,
+    title: req.body.title || blogs[index].title,
+    description: req.body.description || blogs[index].description,
+    data: req.body.data || blogs[index].data,
+    category: req.body.category || blogs[index].category,
+    tags: req.body.tags || blogs[index].tags,
+    author: req.body.author || blogs[index].author,
     createdOn: blogs[index].createdOn,
   };
   blogs[index] = updatedBlog;
