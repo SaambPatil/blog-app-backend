@@ -1,15 +1,35 @@
-import { v4 as uuidv4 } from "uuid";
-const blogs = [
-  {
-    id: uuidv4(),
-    title: "Introduction to Graphs",
-    description: "ucdsuvsdv vsbv",
-    data: "cjdbjbc",
-    category: "datastructures",
-    tags: "datastructures,algorithms,graphs",
-    author: "abhishek",
-    createdOn: "07-10-2024",
-  },
-];
+import mongoose from "mongoose";
 
-export default blogs;
+const blogSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  data: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  tags: {
+    type: [String], 
+    required: true,
+  },
+  author: {
+    type: String,
+    required: true,
+  },
+  createdOn: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const Blogs = mongoose.model("Blog", blogSchema);
+export default Blogs;

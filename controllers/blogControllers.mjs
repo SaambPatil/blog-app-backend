@@ -1,171 +1,83 @@
-import blogs from "../models/data.mjs";
-import { v4 as uuidv4 } from "uuid";
+import Blogs from "../models/data.mjs";
 
+export const postBlog = async (req, res) => {
+  try {
+    console.log("Received POST request");
+    const { title, description, data, category, tags, author } = req.body;
 
-export const getBlog = (req, res) => {
-  console.log("Received GET request");
+    if (!title || !description || !data || !category || !tags || !author) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
 
-  const { category, author } = req.query;
+    const newBlog = await Blogs.create({
+      title,
+      description,
+      data,
+      category,
+      tags,
+      author,
+    });
 
-  console.log("Category received:", category);
-  console.log("Author received:", author);
-
-  if (category && author) {
-    const filteredBlogs = blogs.filter(
-      (blog) => blog.category == category && blog.author == author
-    );
-    return res.status(200).json(filteredBlogs);
+    res.status(201).json(newBlog);
+  } catch (error) {
+    console.error("Error in POST /blogs:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  if (category) {
-    const filteredBlogs = blogs.filter((blog) => blog.category == category);
-    return res.status(200).json(filteredBlogs);
-  }
-
-  if (author) {
-    const filteredBlogs = blogs.filter((blog) => blog.author == author);
-    return res.status(200).json(filteredBlogs);
-  }
-
-  res.status(200).json(blogs);
 };
 
-export const getBlogByID = (req, res) => {
-  console.log("Received GET request by ID");
+export const getBlog = async (req, res) => {
+  try {
+    console.log("Received GET request for Blogs");
 
-  const { id } = req.params;
-  const blog = blogs.find((b) => b.id == id);
-
-  if (blog) {
-    return res.status(200).json(blog);
+    const allBlogs = await Blogs.find({});
+    res.status(200).json(allBlogs);
+  } catch (error) {
+    console.error("Error in GET /blogs:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  res.status(404).json({ error: "Blog not found" });
 };
 
-// app.get("/blogs", (req, res) => {
-//   console.log("Received GET FILTER");
+export const getBlogById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Received GET request for blog with ID: ${id}`);
 
-//   const { category } = req.query;
-//    console.log("Category received:", category);
-//   // if (category) {
-//   //   const filteredBlogs = [];
-//   //   for (let i = 0; i < blogs.length; i++) {
-//   //     if (blogs[i].category == category) {
-//   //       filteredBlogs.push(blogs[i]);
-//   //     }
-//   //   }
-//   // }
+    const blog = await Blogs.findById(id);
 
-//   // if (category) {
-//   //   const filteredBlogs = [];
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
 
-//   //   blogs.forEach((blog) => {
-//   //     if (blog.category == category) {
-//   //       filteredBlogs.push(blog);
-//   //     }
-//   //   });
-//   // }
-
-//   if (category) {
-//     const filteredBlogs = blogs.filter((blog) => blog.category == category);
-//     return res.status(200).json(filteredBlogs);
-//   }
-
-//   console.log("Found");
-//   res.status(200).json({ error: "Invalid category" });
-// });
-
-export const postBlog = (req, res) => {
-  console.log("Received POST request");
-
-  const { title, description, data, category, tags, author } = req.body;
-
-  const newBlog = {
-    id: uuidv4(),
-    title,
-    description,
-    data,
-    category,
-    tags,
-    author,
-    createdOn: new Date().toISOString().split("T")[0],
-  };
-
-  blogs.push(newBlog);
-  res.status(201).json(newBlog);
+    res.status(200).json(blog);
+  } catch (error) {
+    console.error("Error retrieving blog by ID:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
-export const putBlog = (req, res) => {
-  console.log("Received PUT request");
-
-  const id = req.params.id;
-
-  const index = blogs.findIndex((x) => x.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: "Blog not found" });
+export const deleteAllBlogs = async (req, res) => {
+  try {
+    console.log("Received DELETE request to delete all blogs");
+    await Blogs.deleteMany({});
+  } catch (error) {
+    console.error("Error in GET /blogs:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  const { title, description, data, category, tags, author } = req.body;
-
-  if (!title || !description || !data || !category || !tags || !author) {
-    return res.status(400).json({ error: "All fields are required." });
-  }
-
-  const updatedBlog = {
-    id,
-    title,
-    description,
-    data,
-    category,
-    tags,
-    author,
-    createdOn: blogs[index].createdOn,
-  };
-  blogs[index] = updatedBlog;
-  res.status(201).json(updatedBlog);
 };
 
-export const patchBlog = (req, res) => {
-  console.log("Received PATCH request");
-  const id = req.params.id;
+export const deleteBlogById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Received DELETE request for blog with ID: ${id}`);
 
-  const index = blogs.findIndex((x) => x.id === id);
+    const deletedBlog = await Blogs.findByIdAndDelete(id);
 
-  if (index === -1) {
-    return res.status(404).json({ error: "Blog not found" });
+    if (!deletedBlog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+    res.status(200).json({ message: "Blog deleted successfully", deletedBlog });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  const updatedBlog = {
-    id: blogs[index].id,
-    title: req.body.title || blogs[index].title,
-    description: req.body.description || blogs[index].description,
-    data: req.body.data || blogs[index].data,
-    category: req.body.category || blogs[index].category,
-    tags: req.body.tags || blogs[index].tags,
-    author: req.body.author || blogs[index].author,
-    createdOn: blogs[index].createdOn,
-  };
-  blogs[index] = updatedBlog;
-  res.status(201).json(updatedBlog);
-};
-
-export const deleteBlog = (req, res) => {
-  console.log("Received DELETE request");
-  const id = req.params.id;
-
-  const index = blogs.findIndex((x) => x.id == id);
-
-  if (index == -1) {
-    console.log("INFINITE");
-    return res.status(404).json({ error: "Blog Not Found" });
-  }
-
-  const deletedBlog = blogs[index];
-
-  blogs.splice(index, 1);
-
-  res.status(200).json({ message: "Deleted blog:", deletedBlog });
-
 };
