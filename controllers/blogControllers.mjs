@@ -1,4 +1,4 @@
-import Blogs from "../models/data.mjs";
+import Blogs from "../models/blogdata.mjs";
 
 export const postBlog = async (req, res) => {
   try {
@@ -59,6 +59,7 @@ export const deleteAllBlogs = async (req, res) => {
   try {
     console.log("Received DELETE request to delete all blogs");
     await Blogs.deleteMany({});
+    return res.status(400).json({ message: "Blogs deleted successfully" });
   } catch (error) {
     console.error("Error in GET /blogs:", error.message);
     res.status(500).json({ error: "Internal Server Error" });

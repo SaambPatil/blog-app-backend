@@ -3,6 +3,7 @@ import morgan from "morgan";
 import connectDb from "./db.mjs";
 import dotenv from "dotenv";
 import blogRouter from "./routes/blogRoute.mjs";
+import userRouter from "./routes/userRoute.mjs";
 
 dotenv.config();
 connectDb();
@@ -16,6 +17,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/", blogRouter);
+app.use("/", userRouter);
 
 const port = 3000;
 app.listen(port, () => {
